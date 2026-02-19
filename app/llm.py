@@ -24,6 +24,11 @@ def analisar_com_ia(dados_tecnicos):
 
     try:
         resposta = requests.post(URL_OLLAMA_API, json=payload)
-        return resposta.json()['response']
+        resposta_json = resposta.json()
+        
+        # Debug para entender o que o Ollama está retornando
+        # print(f"DEBUG OLLAMA: {resposta_json}") 
+        
+        return resposta_json.get("response", f"IA não retornou resposta 'response'. Chaves disponíveis: {list(resposta_json.keys())}")
     except Exception as e:
         return f"Erro na IA: {e}"

@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   ollama:
     image: ollama/ollama
@@ -26,8 +24,14 @@ services:
       - ollama
     environment:
       - OLLAMA_HOST=http://ollama:11434
+      - TARGET_IP=host.docker.internal
     ports:
       - "3333:3333"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3333/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     restart: unless-stopped
 
 volumes:
