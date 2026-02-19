@@ -6,12 +6,18 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:11434/api/tags" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
 
   ollama-init:
     image: ollama/ollama
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
     entrypoint: >
       /bin/sh -c " sleep 5 && ollama pull llama3 && echo 'Modelo baixado com sucesso!' "
     volumes:
@@ -21,7 +27,8 @@ services:
     build: .
     container_name: sentinela_app
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
     environment:
       - OLLAMA_HOST=http://ollama:11434
       - TARGET_IP=host.docker.internal

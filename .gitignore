@@ -1,1 +1,5 @@
-__pycache__/\n*.pyc\nrelatorio_sentinela_*.txt\n*.log
+__pycache__/
+**/__pycache__/
+*.pyc
+relatorio_sentinela_*.txt
+*.log
