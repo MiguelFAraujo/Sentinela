@@ -1,28 +1,102 @@
 # Sentinela 🛡️
 
-# Sentinela com Docker
+# 🛡️ Sentinela
 
-Requisitos:
-- Docker
-- Docker Compose
-- (Opcional) Ollama para uso local
+Sentinela é um EDR experimental open-source que integra monitoramento de sistema com análise via LLM local (Ollama), executando totalmente offline.
 
-## Como rodar:
+![CI](https://github.com/MiguelFAraujo/Sentinela/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![Ollama](https://img.shields.io/badge/AI-Ollama-orange)
+
+## Arquitetura
+
+O Sentinela roda em uma arquitetura moderna e containerizada, separando responsabilidades entre o agente de monitoramento e o motor de inferência IA.
+
+```mermaid
+graph TD
+    A[Sentinela App] -->|HTTP| B[Ollama LLM]
+    A -->|Netstat/Nmap| C[System Monitor]
+    B -->|Model Load| D[Volume Persistente]
+```
+
+### Componentes
+
+- **Sentinela App (`app/`)**: Core em Python que orquestra varreduras e análise.
+- **Scanner**: Módulo que utiliza `nmap` e `psutil` para mapear a superfície de ataque local.
+- **LLM Client**: Interface de comunicação com a API do Ollama.
+- **Ollama**: Servidor de inferência executando o modelo `llama3` (ou `phi3`) isolado.
+
+---
+
+## 🚀 Como Rodar (Docker Compose)
+
+A forma recomendada de execução é via Docker Compose, que sobe todo o ambiente com uma única linha de comando.
+
+### Pré-requisitos
+- Docker e Docker Compose instalados
+
+### Execução
 
 ```bash
 git clone https://github.com/MiguelFAraujo/Sentinela
 cd Sentinela
-docker compose up
+docker compose up --build
 ```
 
-## Como atualizar dependências:
+O sistema irá automaticamente:
+1. Baixar as imagens necessárias.
+2. Iniciar o servidor Ollama.
+3. Baixar o modelo de IA (na primeira execução).
+4. Iniciar o agente Sentinela e realizar a primeira varredura.
 
+---
+
+## 📦 Desenvolvimento e Estrutura
+
+O projeto utiliza **uv** para gerenciamento de dependências e ambientes virtuais, garantindo builds reprodutíveis e rápidos.
+
+### Estrutura do Projeto
+
+```
+Sentinela/
+├── app/                 # Código fonte da aplicação
+│   ├── agente.py        # Entrypoint
+│   ├── scanner.py       # Lógica de varredura
+│   ├── llm.py           # Integração com IA
+│   └── config.py        # Configurações
+├── scripts/             # Scripts utilitários (wait-for-ollama)
+├── tests/               # Testes automatizados
+├── .github/             # Workflows de CI/CD
+├── Dockerfile           # Definição da imagem Docker
+└── docker-compose.yml   # Orquestração dos serviços
+```
+
+### Comandos Úteis
+
+Atualizar dependências:
 ```bash
 uv add <lib>
 uv lock
-docker compose build
-docker compose up -d
 ```
+
+Rodar testes localmente:
+```bash
+uv run python -m unittest discover tests
+```
+
+---
+
+## 🤝 Contribuições
+
+Contribuições são bem-vindas! Por favor, abra uma issue ou pull request para melhorias e correções.
+
+## 📄 Licença
+
+Este projeto é distribuído sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+Copyright (c) 2026 Miguel F Araujo
+
 
 ---
 

@@ -28,4 +28,4 @@ RUN chmod +x scripts/wait-for-ollama.sh
 
 EXPOSE 3333
 
-CMD ["bash", "-c", "./scripts/wait-for-ollama.sh && uv run agente.py"]
+CMD ["bash", "-c", "./scripts/wait-for-ollama.sh && uv run app/agente.py"]

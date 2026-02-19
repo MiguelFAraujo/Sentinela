@@ -13,3 +13,6 @@ dependencies = [
     "psutil",
     "python-nmap"
 ]
+
+[project.scripts]
+sentinela = "app.agente:main"
