@@ -1,14 +1,15 @@
 [project]
 name = "sentinela"
 version = "0.1.0"
-description = "EDR com suporte a IA local (Ollama)"
+description = "Sentinela - EDR com IA local via Ollama"
+requires-python = ">=3.12"
 authors = [
   { name="Miguel F Araujo", email="nigelkps1@gmail.com" }
 ]
 dependencies = [
-  "fastapi",
-  "uvicorn",
-  "requests",
-  "psutil",
-  "python-nmap"
+    "fastapi",
+    "uvicorn",
+    "requests",
+    "psutil",
+    "python-nmap"
 ]
