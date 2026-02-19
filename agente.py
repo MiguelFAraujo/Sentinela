@@ -3,12 +3,21 @@ import requests
 import nmap
 import socket
 
+import os
+
 # Configurações
 MODELO = "phi3"
-URL_OLLAMA = "http://localhost:11434/api/generate"
 
-# CORREÇÃO AQUI: Caminho direto, sem parênteses extras
-NMAP_PATH = [r"C:\Program Files (x86)\Nmap\nmap.exe"]
+# Detecta se está rodando no Docker (ou apenas se a env var existe,
+# mas `host.docker.internal` é chave aqui)
+if os.path.exists('/.dockerenv'):
+    URL_OLLAMA = "http://host.docker.internal:11434/api/generate"
+    # No Linux/Docker, o nmap geralmente está no PATH
+    NMAP_PATH = ["nmap"]
+else:
+    URL_OLLAMA = "http://localhost:11434/api/generate"
+    # Caminho Windows
+    NMAP_PATH = [r"C:\Program Files (x86)\Nmap\nmap.exe"]
 
 def pegar_ip_local():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
