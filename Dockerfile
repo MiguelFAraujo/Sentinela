@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-# Instala uv e nmap (CRÍTICO: nmap é necessário para python-nmap funcionar)
+# Instala manager uv
 RUN pip install uv && \
     apt-get update && \
     apt-get install -y nmap && \
@@ -8,13 +8,10 @@ RUN pip install uv && \
 
 WORKDIR /app
 
-# Copia arquivos de definição de dependência
+# Copia e instala dependências
 COPY pyproject.toml uv.lock ./
-
-# Instala dependências usando uv
 RUN uv sync --frozen
 
 COPY . .
 
-# Executa usando o ambiente gerenciado pelo uv
 CMD ["uv", "run", "agente.py"]
