@@ -42,18 +42,49 @@ irm https://raw.githubusercontent.com/MiguelFAraujo/Sentinela/main/setup.ps1 | i
 
 ---
 
-## Quick Start
+## Quick Start / Command Manual
 
-After installation, the `sentinela` command is available in your terminal:
+After installation, the comprehensive `sentinela` command is available directly in your terminal. Here is the manual of what each command does:
 
+### 1. Starting the Service
 ```bash
-sentinela              # Start all services
-sentinela scan         # Run a manual scan
-sentinela logs         # Follow logs in real-time
-sentinela status       # Show container status
-sentinela down         # Stop all services
-sentinela update       # Update to the latest version
+sentinela up           # Starts all core services (API and AI engine) in the background
 ```
+*Use this when you want to leave the Sentinela API running continuously to accept external requests.*
+
+### 2. Scanning and Analysis
+```bash
+sentinela scan         # Runs a full network and process scan on your local machine
+```
+*This is the core feature. It maps open ports, identifies running processes, and sends the context to the local AI for a deep security analysis report.*
+
+### 3. Monitoring and Management
+```bash
+sentinela logs         # Follows the real-time application and AI logs
+sentinela status       # Shows the health status of background containers/services
+```
+*Use these commands to debug issues or check if the AI is still processing a large request.*
+
+### 4. Lifecycle
+```bash
+sentinela update       # Fetches the latest code from GitHub and updates the system
+sentinela down         # Completely stops all background services
+```
+
+---
+
+## Why Sentinela? (vs. Competitors)
+
+While enterprise EDRs (Endpoint Detection and Response) like CrowdStrike, SentinelOne, or Microsoft Defender are incredibly powerful, they come with a few trade-offs that Sentinela solves:
+
+1. **Absolute Privacy (100% Offline AI)**:
+   Commercial tools often upload your telemetry, process lists, and sometimes even files to their cloud for machine learning analysis. **Sentinela uses a local LLM (`llama3.2`)**. Your network topology and process data *never* leave your machine.
+2. **Open Source & Transparent**:
+   You can read exactly what the scanner is doing and what the AI is being prompted with. There are no black-box kernel drivers hidden from you.
+3. **No Kernel Panic Risks**:
+   Unlike traditional EDRs that install deep OS drivers (which can occasionally cause bluescreens globally), Sentinela operates entirely in user-space utilizing standard tools like Nmap and psutil.
+4. **Forever Free**:
+   No enterprise licenses, no SaaS subscriptions, and no paywalls. Sentinela is built for the community.
 
 **API available at:** `http://localhost:3333`
 **Interactive docs:** `http://localhost:3333/docs`
@@ -99,7 +130,7 @@ graph TD
 | **Sentinela App** (`app/`) | Python core — orchestrates scans and analysis via FastAPI |
 | **Scanner** (`scanner.py`) | Nmap + psutil to map the local attack surface |
 | **LLM Client** (`llm.py`) | Interface with the Ollama API (SOC prompt system) |
-| **Ollama** | Inference server running `llama3` in an isolated container |
+| **Ollama** | Inference server running `llama3.2` in an isolated container |
 
 ---
 
@@ -179,7 +210,7 @@ uv run sentinela scan --target 127.0.0.1   # Local scan
 | Variable | Default | Description |
 |---|---|---|
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama server URL |
-| `MODELO` | `llama3` | AI model to use |
+| `MODELO` | `llama3.2` | AI model to use |
 | `TARGET_IP` | Auto-detected | Target IP for scanning |
 | `SENTINELA_HOST` | `0.0.0.0` | API server host |
 | `SENTINELA_PORT` | `3333` | API server port |
@@ -201,7 +232,7 @@ uv run sentinela scan --target 127.0.0.1   # Local scan
 
 > **Educational**: This is a learning project. It does not replace professional EDR solutions.
 >
-> **Privacy**: Your data never leaves your computer. llama3 runs 100% locally.
+> **Privacy**: Your data never leaves your computer. llama3.2 runs 100% locally.
 >
 > **Legality**: Do not scan third-party networks without authorization.
 

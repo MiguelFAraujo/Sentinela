@@ -20,7 +20,7 @@ services:
       ollama:
         condition: service_healthy
     entrypoint: >
-      /bin/sh -c "sleep 3 && ollama pull llama3 && echo '✅ Model downloaded!'"
+      /bin/sh -c "sleep 3 && ollama pull llama3.2 && echo '✅ Model downloaded!'"
     environment:
       - OLLAMA_HOST=http://ollama:11434
     volumes:

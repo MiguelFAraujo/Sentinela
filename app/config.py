@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 # ── AI Model ──────────────────────────────────────────────────
-MODEL: str = os.getenv("MODELO", "llama3")
+MODEL: str = os.getenv("MODELO", "llama3.2")
 OLLAMA_HOST: str = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
 # Ensure full API URL

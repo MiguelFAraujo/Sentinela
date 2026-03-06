@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.1.2] — 2026-03-06
+
+### Changed
+- **Default AI Model Optimization** — In order to provide a lighter and faster offline AI experience, the default Ollama model was changed from `llama3` (~4.7GB) to `llama3.2` (~2.0GB). This affects both the `docker-compose.yml` (`ollama-init`) and the native Python fallback execution config.
+
+### Added
+- **Global `sentinela` CLI for Bare-Metal** — The native Windows setup script (`setup.ps1`) now permanently binds the `sentinela` command to the user's system PATH. Users who opt to install directly without Docker can now execute the exact same toolset directly from PowerShell:
+  - `sentinela up` — Starts the REST API locally.
+  - `sentinela scan --target <IP>` — Runs the network and process discovery scan directly in the host OS.
+- PSScriptAnalyzer lint fixes for the Windows setup script unapproved verbs.
+
+---
+
 ## [3.1.1] — 2026-03-06
 
 ### Fixed

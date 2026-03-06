@@ -7,6 +7,8 @@
 $ErrorActionPreference = "Stop"
 
 $Repo = "MiguelFAraujo/Sentinela"
+$InstallDir = "$env:LOCALAPPDATA\Sentinela"
+$BinDir = "$InstallDir\bin"
 $DataDir = "$env:USERPROFILE\SentinelaApp"
 
 function Write-Header {
@@ -43,8 +45,8 @@ function Install-Dependency {
     }
 
     Write-Info "Installing $AppId via winget... (This might prompt for Administrator privileges)"
-    $args = @("install", "--id", $AppId, "-e", "--accept-package-agreements", "--accept-source-agreements", "--silent")
-    & winget $args
+    $wingetArgs = @("install", "--id", $AppId, "-e", "--accept-package-agreements", "--accept-source-agreements", "--silent")
+    & winget $wingetArgs
     
     if ($LASTEXITCODE -ne 0) {
         Write-Fail "Failed to install $AppId"
@@ -82,7 +84,7 @@ function Install-Repository {
     Write-Success "Repository ready at $DataDir"
 }
 
-function Setup-Environment {
+function Initialize-Environment {
     Write-Info "Setting up Python environment and dependencies..."
     Push-Location $DataDir
     & uv sync
@@ -90,10 +92,67 @@ function Setup-Environment {
     Write-Success "Python environment ready"
 }
 
-function Pull-AI-Model {
-    Write-Info "Pulling Ollama 'llama3' model. This is ~4.7GB and might take a while..."
-    & ollama pull llama3
-    Write-Success "Model llama3 is ready!"
+function Install-AIModel {
+    Write-Info "Pulling Ollama 'llama3.2' model. This is ~2.0GB and might take a few minutes..."
+    & ollama pull llama3.2
+    Write-Success "Model llama3.2 is ready!"
+}
+
+function Install-Launcher {
+    New-Item -ItemType Directory -Force -Path $BinDir | Out-Null
+
+    $LauncherContent = @"
+@echo off
+setlocal
+
+set "SENTINELA_HOME=$DataDir"
+
+if not exist "%SENTINELA_HOME%" (
+    echo Sentinela not found. Please run the setup wizard again.
+    exit /b 1
+)
+
+pushd "%SENTINELA_HOME%"
+
+if "%~1"=="" goto :cmd_up
+if /i "%~1"=="up"     goto :cmd_up
+if /i "%~1"=="start"  goto :cmd_up
+if /i "%~1"=="scan"   goto :cmd_scan
+goto :cmd_help
+
+:cmd_up
+echo 🛡️  Starting Sentinela API (Bare Metal)...
+uv run python -m app.agente start_api
+goto :end
+
+:cmd_scan
+echo 🔍 Running scan (Bare Metal)...
+uv run python -m app.agente scan %2 %3
+goto :end
+
+:cmd_help
+echo Usage: sentinela {up^|scan}
+echo.
+echo   up      Start the API service (default)
+echo   scan    Run a manual scan
+goto :end
+
+:end
+popd
+endlocal
+"@
+
+    Set-Content -Path "$BinDir\sentinela.cmd" -Value $LauncherContent -Encoding UTF8
+    Write-Success "Command 'sentinela' installed at $BinDir"
+}
+
+function Add-ToPath {
+    $currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($currentPath -notlike "*$BinDir*") {
+        [Environment]::SetEnvironmentVariable("Path", "$BinDir;$currentPath", "User")
+        $env:Path = "$BinDir;$env:Path"
+        Write-Warn "PATH updated — open a new terminal to use the 'sentinela' command"
+    }
 }
 
 function Write-Summary {
@@ -104,14 +163,9 @@ function Write-Summary {
     Write-Host ""
     Write-Host "  To run Sentinela locally without Docker:"
     Write-Host ""
-    Write-Host "  1. Enter the directory:"
-    Write-Host "     cd $DataDir" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "  2. Start the API:"
-    Write-Host "     uv run python -m app.agente start_api" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "  3. Or run a network scan directly:"
-    Write-Host "     uv run python -m app.agente scan --target 127.0.0.1" -ForegroundColor Cyan
+    Write-Host "  You can now use the global command from anywhere:" -ForegroundColor Cyan
+    Write-Host "     sentinela up" -ForegroundColor Green
+    Write-Host "     sentinela scan --target 127.0.0.1" -ForegroundColor Green
     Write-Host ""
     Write-Host "  Note: you might need to restart your terminal first so the new PATH is fully applied." -ForegroundColor Yellow
     Write-Host ""
@@ -125,6 +179,8 @@ Install-Dependency "Insecure.Nmap" "nmap"
 Install-Dependency "Ollama.Ollama" "ollama"
 Install-Uv
 Install-Repository
-Setup-Environment
-Pull-AI-Model
+Initialize-Environment
+Install-AIModel
+Install-Launcher
+Add-ToPath
 Write-Summary
