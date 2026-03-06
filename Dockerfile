@@ -28,4 +28,4 @@ RUN chmod +x scripts/wait-for-ollama.sh
 
 EXPOSE 3333
 
-CMD ["bash", "-c", "./scripts/wait-for-ollama.sh && uv run app/agente.py"]
+CMD ["bash", "-c", "./scripts/wait-for-ollama.sh && uv run uvicorn app.agente:app --host 0.0.0.0 --port 3333"]
