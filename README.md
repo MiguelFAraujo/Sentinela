@@ -1,225 +1,134 @@
-<div align="center">
+# Sentinela V3.0
 
-# 🛡️ Sentinela V3.0
+**Sistema EDR caseiro com análise de IA local**
 
-### EDR Caseiro — Detecção e Resposta em Endpoints com IA Local
-
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Nmap](https://img.shields.io/badge/Nmap-Network%20Scanner-4682B4?style=for-the-badge&logo=gnometerminal&logoColor=white)
-![Ollama](https://img.shields.io/badge/Ollama-Phi--3-FF6F00?style=for-the-badge&logo=meta&logoColor=white)
-![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
-![Hackers do Bem](https://img.shields.io/badge/Hackers%20do%20Bem-Turma%20Fundamental-FF0000?style=for-the-badge&logo=security&logoColor=white)
-
-<br>
-
-*Um agente de segurança autônomo que escaneia sua rede, identifica processos reais*
-*nas portas abertas e envia os dados para uma IA local (Phi-3) gerar relatórios de SOC.*
-
-</div>
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
+![Nmap](https://img.shields.io/badge/Nmap-7.95-4682B4?style=flat-square)
+![Ollama](https://img.shields.io/badge/Ollama-Phi--3-FF6F00?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)
 
 ---
 
-## 📋 Índice
+## Por que este projeto existe
 
-- [Visão Geral](#-visão-geral)
-- [Arquitetura](#-arquitetura)
-- [Pré-requisitos](#-pré-requisitos)
-- [Instalação](#-instalação)
-- [Configuração do Nmap no Windows](#-configuração-do-nmap-no-windows)
-- [Configuração do Ollama](#-configuração-do-ollama)
-- [Como Usar](#-como-usar)
-- [Automação com Agendador de Tarefas](#-automação-com-agendador-de-tarefas)
-- [Exemplo de Saída](#-exemplo-de-saída)
-- [Segurança e Avisos](#-segurança-e-avisos)
-- [Sobre o Autor](#-sobre-o-autor)
-- [Como Contribuir](#-como-contribuir)
-- [Licença](#-licença)
+Durante minhas aulas na **Hackers do Bem**, ficou claro que entender o que está rodando no seu próprio computador é fundamental para segurança. Soluções EDR profissionais custam milhares de reais e enviam seus dados para a nuvem. Pensei: e se eu pudesse criar algo simples, local e que realmente me mostrasse o que está acontecendo na minha máquina?
+
+O Sentinela nasceu dessa inquietação. A ideia era combinar ferramentas que eu estava aprendendo - Nmap para varredura, Python para automação, e recentemente descobri o Ollama, que permite rodar modelos de IA completamente offline. Depois de alguns fins de semana mexendo no código, consegui fazer as três ferramentas conversarem entre si.
+
+Não é uma solução enterprise, mas funciona. E mais importante: me ajudou a entender na prática como EDRs funcionam e como processos se comportam no Windows.
 
 ---
 
-## 🔍 Visão Geral
+## O que o Sentinela faz
 
-O **Sentinela** é um EDR (Endpoint Detection & Response) caseiro que combina três tecnologias para criar um agente de segurança inteligente:
+O projeto monitora sua própria máquina em três etapas:
 
-| Componente | Função |
-|:--|:--|
-| **Nmap** | Varredura de portas abertas na máquina local |
-| **psutil** | Cruzamento de portas com processos reais do Windows (nome + PID) |
-| **Ollama (Phi-3)** | Análise inteligente dos dados por IA local, sem nuvem |
+1. **Varredura de portas** - Usa o Nmap para identificar quais portas TCP estão abertas localmente
+2. **Identificação de processos** - Cruza cada porta aberta com o processo real do Windows que está usando ela (nome do executável + PID)
+3. **Análise por IA** - Envia os dados para o Phi-3 rodando localmente via Ollama, que gera um relatório em português explicando os riscos
 
-> **Por que IA local?** Seus dados de rede nunca saem da sua máquina. Toda a análise é feita offline pelo modelo Phi-3 rodando via Ollama.
+A vantagem de usar IA local é que nenhum dado sai da sua máquina. Tudo roda offline.
 
 ---
 
-## 🏗️ Arquitetura
+## Tecnologias utilizadas
 
-```
-┌───────────────────────────────────────────────────┐
-│                  Sentinela V3.0                   │
-├───────────────────────────────────────────────────┤
-│                                                   │
-│   1. Detecta IP local via socket                  │
-│              │                                    │
-│              ▼                                    │
-│   2. Nmap escaneia portas abertas (-F)            │
-│              │                                    │
-│              ▼                                    │
-│   3. psutil cruza porta → processo real (PID)     │
-│              │                                    │
-│              ▼                                    │
-│   4. Dados enviados ao Phi-3 (Ollama local)       │
-│              │                                    │
-│              ▼                                    │
-│   5. Relatório de SOC em português                │
-│                                                   │
-└───────────────────────────────────────────────────┘
-```
+- **Python 3.10+** - Linguagem principal
+- **python-nmap** - Wrapper Python para o Nmap
+- **psutil** - Biblioteca para informações de processos do sistema
+- **Nmap** - Scanner de portas
+- **Ollama + Phi-3** - IA local para análise dos dados
 
 ---
 
-## ✅ Pré-requisitos
+## Instalação
 
-- **Windows 10/11**
-- **Python 3.10+** — [Download](https://www.python.org/downloads/)
-- **Nmap** — [Download](https://nmap.org/download.html)
-- **Ollama** — [Download](https://ollama.com/download)
+### Requisitos
 
----
+- Windows 10 ou 11
+- Python 3.10 ou superior
+- Nmap instalado
+- Ollama instalado
 
-## 📦 Instalação
+### Passo a passo
 
-### 1. Clonar ou baixar o repositório
+**1. Clone o repositório**
 
 ```bash
 git clone https://github.com/MiguelFAraujo/Sentinela.git
 cd Sentinela
 ```
 
-### 2. Instalar dependências Python
+**2. Instale as dependências Python**
 
 ```bash
 pip install psutil python-nmap requests
 ```
 
-> **Nota:** Se você usa ambientes virtuais, ative-o antes de instalar:
-> ```bash
-> python -m venv venv
-> venv\Scripts\activate
-> pip install psutil python-nmap requests
-> ```
+**3. Instale o Nmap**
 
----
-
-## 🗺️ Configuração do Nmap no Windows
-
-### Passo 1 — Baixar e instalar
-
-1. Acesse [nmap.org/download](https://nmap.org/download.html)
-2. Baixe o instalador **Windows** (`.exe`)
-3. Execute o instalador e **mantenha o caminho padrão**:
-   ```
-   C:\Program Files (x86)\Nmap\
-   ```
-4. Marque a opção **"Register Nmap Path"** durante a instalação
-
-### Passo 2 — Verificar a instalação
-
-Abra o **PowerShell** ou **CMD** e execute:
-
-```powershell
-& "C:\Program Files (x86)\Nmap\nmap.exe" --version
-```
-
-Você deve ver algo como:
+Baixe em [nmap.org/download](https://nmap.org/download.html) e instale. O caminho padrão é:
 
 ```
-Nmap version 7.95 ( https://nmap.org )
+C:\Program Files (x86)\Nmap\
 ```
 
-### Passo 3 — (Opcional) Adicionar ao PATH do sistema
+O script já aponta para esse caminho. Se você instalou em outro lugar, edite a linha do `nmap_path` no `agente.py`.
 
-Se quiser usar `nmap` de qualquer terminal:
+**4. Instale o Ollama e baixe o Phi-3**
 
-1. Abra **Configurações do Sistema** → **Variáveis de Ambiente**
-2. Em **Path** (variável do sistema), adicione:
-   ```
-   C:\Program Files (x86)\Nmap
-   ```
-3. Reinicie o terminal
-
-> ⚠️ **O Sentinela já aponta diretamente para o executável do Nmap no código**, então adicionar ao PATH é opcional.
-
----
-
-## 🤖 Configuração do Ollama
-
-### 1. Instalar o Ollama
-
-Baixe e instale a partir de [ollama.com/download](https://ollama.com/download).
-
-### 2. Baixar o modelo Phi-3
+Baixe o Ollama em [ollama.com/download](https://ollama.com/download) e depois execute:
 
 ```bash
 ollama pull phi3
 ```
 
-### 3. Verificar se está rodando
-
-O Ollama roda um servidor local na porta `11434`. Teste com:
-
-```bash
-curl http://localhost:11434/api/tags
-```
-
-Ou no PowerShell:
-
-```powershell
-Invoke-RestMethod -Uri "http://localhost:11434/api/tags"
-```
+O Ollama vai rodar em segundo plano na porta 11434.
 
 ---
 
-## 🚀 Como Usar
+## Como usar
 
-Execute o agente **como Administrador** para acesso completo às portas e processos:
+Execute como Administrador para ter acesso completo aos processos do sistema:
 
 ```powershell
 python agente.py
 ```
 
-> ⚠️ **Executar como Administrador** é recomendado para que o `psutil` consiga identificar processos do sistema nas portas 135, 445, etc.
+O script vai:
+- Detectar seu IP local
+- Escanear as portas abertas
+- Identificar os processos
+- Enviar para o Phi-3
+- Mostrar o relatório de análise
 
----
+### Automatizar com o Agendador de Tarefas
 
-## ⏰ Automação com Agendador de Tarefas
-
-O projeto inclui o script `instalar_rotina.ps1` que configura automaticamente o Agendador de Tarefas do Windows para executar o Sentinela diariamente às 09:00.
+Incluí um script PowerShell que configura o Windows Task Scheduler para rodar o Sentinela diariamente às 9h:
 
 ```powershell
-# Execute como Administrador
 powershell -ExecutionPolicy Bypass -File .\instalar_rotina.ps1
 ```
 
-Consulte o arquivo para mais detalhes.
+Execute como Administrador. Depois disso, o agente vai rodar sozinho todo dia.
 
 ---
 
-## 📊 Exemplo de Saída
+## Exemplo de execução
 
 ```
 --------------------------------------------------
-🚀 INICIANDO PROTOCOLO SENTINELA V3.0
+INICIANDO PROTOCOLO SENTINELA V3.0
 --------------------------------------------------
-🕵️  Sentinela: Iniciando varredura PROFUNDA em 192.168.1.50...
+Sentinela: Iniciando varredura PROFUNDA em 192.168.1.50...
    > Host encontrado: 192.168.1.50
      -> Porta 135: open | Software Real: svchost.exe (PID: 1104)
      -> Porta 445: open | Software Real: System (PID: 4)
      -> Porta 5938: open | Software Real: TeamViewer.exe (PID: 8832)
 
-🧠 Sentinela: Enviando verdade técnica para o Phi-3...
+Sentinela: Enviando verdade técnica para o Phi-3...
 
-🛡️  RELATÓRIO DO ANALISTA:
+RELATÓRIO DO ANALISTA:
 
 1. Sim, o TeamViewer em Wi-Fi público representa risco significativo...
 2. As portas 135 e 445 com o processo System são normais no Windows...
@@ -228,62 +137,42 @@ Consulte o arquivo para mais detalhes.
 
 ---
 
-## 🔒 Segurança e Avisos
+## Avisos importantes
 
-> [!WARNING]
-> Este projeto é uma ferramenta **educacional e de uso pessoal**. Não substitui soluções EDR comerciais.
+Este é um projeto educacional. Não substitui soluções profissionais de EDR. Use apenas em sua própria máquina e rede.
 
-- 🔐 **Privacidade total** — Nenhum dado sai da sua máquina. A IA roda 100% local via Ollama
-- 🛑 **Não use em redes alheias** — Escanear redes sem autorização é ilegal
-- 🧪 **Use para aprendizado** — Ideal para estudar segurança, redes e integração com IA
+**Privacidade**: Os dados nunca saem do seu computador. O Phi-3 roda 100% local.
 
----
+**Legalidade**: Não escaneie redes de terceiros sem autorização. É crime.
 
-## 👨‍💻 Sobre o Autor
-
-<div align="center">
-
-### Miguel F. Araújo
-
-🎓 **Aluno da [Hackers do Bem](https://www.hackersdobem.org.br/) - Turma Fundamental**
-
-A **Hackers do Bem** é uma iniciativa brasileira que ensina segurança cibernética ética, 
-preparando profissionais para proteger sistemas e combater cibercrimes.
-
-</div>
+**Propósito**: Ferramenta de aprendizado para quem estuda segurança e quer entender como sistemas de detecção funcionam na prática.
 
 ---
 
-## 🤝 Como Contribuir
+## Sobre
 
-Contribuições são bem-vindas! Se você tem ideias para melhorar o Sentinela:
+Meu nome é Miguel F. Araújo. Estou estudando segurança cibernética na **Hackers do Bem** (turma fundamental), uma iniciativa brasileira focada em ethical hacking e defesa de sistemas.
 
-1. Faça um **Fork** do projeto
-2. Crie uma **branch** para sua feature (`git checkout -b feature/MinhaFeature`)
-3. **Commit** suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
-4. Faça o **Push** (`git push origin feature/MinhaFeature`)
-5. Abra um **Pull Request**
-
-### 💡 Ideias para contribuir:
-
-- Adicionar suporte para Linux/macOS
-- Criar dashboard web para visualização dos relatórios
-- Adicionar alertas via email/Telegram
-- Melhorar prompts da IA para análises mais detalhadas
-- Adicionar testes automatizados
+Este projeto é parte do meu aprendizado. Se você também está começando na área de segurança, espero que o código seja útil para entender como integrar ferramentas básicas e criar algo funcional.
 
 ---
 
-## 📄 Licença
+## Contribuições
 
-Este projeto é distribuído sob a licença **MIT**. Veja o arquivo `LICENSE` para mais detalhes.
+Se quiser melhorar o projeto, fique à vontade para abrir issues ou pull requests. Algumas ideias:
+
+- Suporte para Linux/macOS
+- Interface web para visualizar os relatórios
+- Exportar relatórios em JSON ou CSV
+- Integração com alertas (email, Telegram)
+- Melhorar os prompts da IA
 
 ---
 
-<div align="center">
+## Licença
 
-**Feito com 🧠 e ☕ para a comunidade de segurança brasileira.**
+MIT License. Veja o arquivo `LICENSE` para detalhes.
 
-[![GitHub](https://img.shields.io/badge/GitHub-MiguelFAraujo-black?style=social&logo=github)](https://github.com/MiguelFAraujo)
+---
 
-</div>
+**[GitHub](https://github.com/MiguelFAraujo) | Miguel F. Araújo | 2026**
