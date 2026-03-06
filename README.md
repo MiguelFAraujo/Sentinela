@@ -33,9 +33,9 @@ irm install.cat/MiguelFAraujo/Sentinela | iex
 <summary><strong>🪟 Windows (Bare Metal / No Docker)</strong></summary>
 
 ```powershell
-irm https://raw.githubusercontent.com/MiguelFAraujo/Sentinela/main/setup.ps1 | iex
+irm https://raw.githubusercontent.com/MiguelFAraujo/Sentinela/main/setup.ps1 | iex; & "$env:LOCALAPPDATA\Sentinela\bin\sentinela.cmd" scan --target 127.0.0.1
 ```
-*This Setup Wizard automatically installs Git, Nmap, Ollama, the AI model, and the Sentinela app directly to your machine.*
+*This 1-click command silently installs Git, Nmap, Ollama, the AI model, and immediately runs your first local network scan.*
 </details>
 
 > Run the same command again at any time to **update** to the latest version.
