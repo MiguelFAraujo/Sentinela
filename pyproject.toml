@@ -1,0 +1,13 @@
+[project]
+name = "sentinela"
+version = "0.1.0"
+description = "Sentinela - Agente de Segurança Local com IA"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "requests",
+    "fastapi",
+    "uvicorn",
+    "psutil",
+    "python-nmap"
+]

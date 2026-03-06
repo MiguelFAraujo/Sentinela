@@ -1,13 +1,20 @@
 FROM python:3.12-slim
 
+# Instala uv e nmap (CRÍTICO: nmap é necessário para python-nmap funcionar)
+RUN pip install uv && \
+    apt-get update && \
+    apt-get install -y nmap && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Install nmap for python-nmap to work
-RUN apt-get update && apt-get install -y nmap && rm -rf /var/lib/apt/lists/*
+# Copia arquivos de definição de dependência
+COPY pyproject.toml uv.lock ./
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Instala dependências usando uv
+RUN uv sync --frozen
 
 COPY . .
 
-CMD ["python", "agente.py"]
+# Executa usando o ambiente gerenciado pelo uv
+CMD ["uv", "run", "agente.py"]

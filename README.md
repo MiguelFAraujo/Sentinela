@@ -1,120 +1,37 @@
-# Sentinela V3.0
+# Sentinela 🛡️
 
-**Sistema EDR caseiro com análise de IA local**
+Sentinela é um agente de segurança local inteligente que monitora portas abertas na sua máquina e utiliza IA local (Ollama) para analisar riscos em tempo real.
 
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
-![Nmap](https://img.shields.io/badge/Nmap-7.95-4682B4?style=flat-square)
-![Ollama](https://img.shields.io/badge/Ollama-Phi--3-FF6F00?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)
+## 🚀 Como Usar (Docker Compose - Recomendado)
 
----
+Este projeto utiliza **Docker Compose** para orquestrar o agente e o servidor Ollama, e **uv** para gerenciamento ultrarrápido de dependências Python.
 
-## Por que este projeto existe
+### Pré-requisitos
+- Docker e Docker Compose instalados
 
-Durante minhas aulas na **Hackers do Bem**, ficou claro que entender o que está rodando no seu próprio computador é fundamental para segurança. Soluções EDR profissionais custam milhares de reais e enviam seus dados para a nuvem. Pensei: e se eu pudesse criar algo simples, local e que realmente me mostrasse o que está acontecendo na minha máquina?
+### Passo a Passo
 
-O Sentinela nasceu dessa inquietação. A ideia era combinar ferramentas que eu estava aprendendo - Nmap para varredura, Python para automação, e recentemente descobri o Ollama, que permite rodar modelos de IA completamente offline. Depois de alguns fins de semana mexendo no código, consegui fazer as três ferramentas conversarem entre si.
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/MiguelFAraujo/Sentinela
+   cd Sentinela
+   ```
 
-Não é uma solução enterprise, mas funciona. E mais importante: me ajudou a entender na prática como EDRs funcionam e como processos se comportam no Windows.
+2. **Inicie a aplicação:**
+   ```bash
+   docker compose up --build
+   ```
 
----
+Isso irá:
+- Iniciar um container com o **Ollama** (API de IA local)
+- Construir e iniciar o container do **Sentinela**
+- O Sentinela aguardará o Ollama e iniciará a varredura automaticamente.
 
-## O que o Sentinela faz
-
-O projeto monitora sua própria máquina em três etapas:
-
-1. **Varredura de portas** - Usa o Nmap para identificar quais portas TCP estão abertas localmente
-2. **Identificação de processos** - Cruza cada porta aberta com o processo real do Windows que está usando ela (nome do executável + PID)
-3. **Análise por IA** - Envia os dados para o Phi-3 rodando localmente via Ollama, que gera um relatório em português explicando os riscos
-
-A vantagem de usar IA local é que nenhum dado sai da sua máquina. Tudo roda offline.
-
----
-
-## Tecnologias utilizadas
-
-- **Python 3.10+** - Linguagem principal
-- **python-nmap** - Wrapper Python para o Nmap
-- **psutil** - Biblioteca para informações de processos do sistema
-- **Nmap** - Scanner de portas
-- **Ollama + Phi-3** - IA local para análise dos dados
+> **Nota:** Na primeira vez, o Ollama pode precisar baixar o modelo `phi3`. Se o agente falhar ao conectar, aguarde alguns instantes e verifique os logs do Ollama.
 
 ---
 
-## Instalação
-
-### Requisitos
-
-- Windows 10 ou 11
-- Python 3.10 ou superior
-- Nmap instalado
-- Ollama instalado
-
-### Passo a passo
-
-**1. Clone o repositório**
-
-```bash
-git clone https://github.com/MiguelFAraujo/Sentinela.git
-cd Sentinela
-```
-
-**2. Instale as dependências Python**
-
-```bash
-pip install psutil python-nmap requests
-```
-
-**3. Instale o Nmap**
-
-Baixe em [nmap.org/download](https://nmap.org/download.html) e instale. O caminho padrão é:
-
-```
-C:\Program Files (x86)\Nmap\
-```
-
-O script já aponta para esse caminho. Se você instalou em outro lugar, edite a linha do `nmap_path` no `agente.py`.
-
-**4. Instale o Ollama e baixe o Phi-3**
-
-Baixe o Ollama em [ollama.com/download](https://ollama.com/download) e depois execute:
-
-```bash
-ollama pull phi3
-```
-
-O Ollama vai rodar em segundo plano na porta 11434.
-
----
-
-## Como usar
-
-Execute como Administrador para ter acesso completo aos processos do sistema:
-
-```powershell
-python agente.py
-```
-
-O script vai:
-- Detectar seu IP local
-- Escanear as portas abertas
-- Identificar os processos
-- Enviar para o Phi-3
-- Mostrar o relatório de análise
-
-### Automatizar com o Agendador de Tarefas
-
-Incluí um script PowerShell que configura o Windows Task Scheduler para rodar o Sentinela diariamente às 9h:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\instalar_rotina.ps1
-```
-
-Execute como Administrador. Depois disso, o agente vai rodar sozinho todo dia.
-
----
-
-## Exemplo de execução
+## 💻 Instalação Manual (Windows/PowerShell)
 
 ```
 --------------------------------------------------

@@ -8,16 +8,21 @@ import os
 # Configurações
 MODELO = "phi3"
 
-# Detecta se está rodando no Docker (ou apenas se a env var existe,
-# mas `host.docker.internal` é chave aqui)
+# Lê URL do Ollama da variável de ambiente, padrão para localhost se não definida
+# Isso funciona tanto no Docker Compose (http://ollama:11434) quanto localmente
+URL_OLLAMA = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+
 if os.path.exists('/.dockerenv'):
-    URL_OLLAMA = "http://host.docker.internal:11434/api/generate"
+    URL_OLLAMA = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434/api/generate")
     # No Linux/Docker, o nmap geralmente está no PATH
     NMAP_PATH = ["nmap"]
 else:
-    URL_OLLAMA = "http://localhost:11434/api/generate"
     # Caminho Windows
     NMAP_PATH = [r"C:\Program Files (x86)\Nmap\nmap.exe"]
+
+# Garante que a URL termine com /api/generate se não tiver
+if not URL_OLLAMA.endswith("/api/generate"):
+    URL_OLLAMA = f"{URL_OLLAMA}/api/generate"
 
 def pegar_ip_local():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
