@@ -25,7 +25,7 @@ graph TD
 - **Sentinela App (`app/`)**: Core em Python que orquestra varreduras e análise.
 - **Scanner**: Módulo que utiliza `nmap` e `psutil` para mapear a superfície de ataque local.
 - **LLM Client**: Interface de comunicação com a API do Ollama.
-- **Ollama**: Servidor de inferência executando o modelo `llama3` (ou `phi3`) isolado.
+- **Ollama**: Servidor de inferência executando o modelo `llama3` isolado.
 
 ---
 
@@ -112,7 +112,7 @@ Sentinela: Iniciando varredura PROFUNDA em 192.168.1.50...
      -> Porta 445: open | Software Real: System (PID: 4)
      -> Porta 5938: open | Software Real: TeamViewer.exe (PID: 8832)
 
-Sentinela: Enviando verdade técnica para o Phi-3...
+Sentinela: Enviando verdade técnica para o llama3...
 
 RELATÓRIO DO ANALISTA:
 
@@ -127,7 +127,7 @@ RELATÓRIO DO ANALISTA:
 
 Este é um projeto educacional. Não substitui soluções profissionais de EDR. Use apenas em sua própria máquina e rede.
 
-**Privacidade**: Os dados nunca saem do seu computador. O Phi-3 roda 100% local.
+**Privacidade**: Os dados nunca saem do seu computador. O llama3 roda 100% local.
 
 **Legalidade**: Não escaneie redes de terceiros sem autorização. É crime.
 

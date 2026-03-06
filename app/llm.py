@@ -23,12 +23,21 @@ def analisar_com_ia(dados_tecnicos):
     }
 
     try:
-        resposta = requests.post(URL_OLLAMA_API, json=payload)
+        resposta = requests.post(URL_OLLAMA_API, json=payload, timeout=60)
+        
+        if resposta.status_code != 200:
+            return f"Erro na API Ollama (Status {resposta.status_code}): {resposta.text}"
+            
         resposta_json = resposta.json()
         
-        # Debug para entender o que o Ollama está retornando
-        # print(f"DEBUG OLLAMA: {resposta_json}") 
-        
-        return resposta_json.get("response", f"IA não retornou resposta 'response'. Chaves disponíveis: {list(resposta_json.keys())}")
+        # Se houver erro explícito do Ollama (ex: model not found)
+        if "error" in resposta_json:
+             return f"Erro retornado pelo Ollama: {resposta_json['error']}"
+
+        return resposta_json.get("response", f"IA não retornou resposta válida. Raw: {str(resposta_json)}")
+    except requests.exceptions.ConnectionError:
+        return "Erro de Conexão: O servidor Ollama parece estar offline ou inacessível."
+    except requests.exceptions.Timeout:
+        return "Timeout: O modelo demorou muito para responder (pode estar carregando)."
     except Exception as e:
-        return f"Erro na IA: {e}"
+        return f"Erro interno na integração IA: {e}"
