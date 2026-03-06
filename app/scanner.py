@@ -1,4 +1,4 @@
-"""Sentinela — Scanner de rede e correlação de processos."""
+"""Sentinela — Network scanner and process correlation."""
 
 from __future__ import annotations
 
@@ -13,8 +13,8 @@ from app.config import NMAP_PATH
 logger = logging.getLogger(__name__)
 
 
-def pegar_ip_local() -> str:
-    """Retorna o IP local da máquina na rede."""
+def get_local_ip() -> str:
+    """Return the local IP address of the machine on the network."""
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         try:
             sock.connect(("8.8.8.8", 1))
@@ -23,43 +23,43 @@ def pegar_ip_local() -> str:
             return "127.0.0.1"
 
 
-def obter_processo_da_porta(porta: int, protocolo: str = "tcp") -> str:
-    """Cruza a porta com a lista de conexões ativas para identificar o processo."""
-    for conn in psutil.net_connections(kind=protocolo):
-        if conn.laddr.port == porta and conn.status == "LISTEN":
+def get_process_by_port(port: int, protocol: str = "tcp") -> str:
+    """Cross-reference a port with active connections to identify the process."""
+    for conn in psutil.net_connections(kind=protocol):
+        if conn.laddr.port == port and conn.status == "LISTEN":
             try:
                 proc = psutil.Process(conn.pid)
                 return f"{proc.name()} (PID: {conn.pid})"
             except (psutil.NoSuchProcess, psutil.AccessDenied):
-                return "Processo Oculto/Sistema"
-    return "Desconhecido"
+                return "Hidden/System Process"
+    return "Unknown"
 
 
-def auditoria_inteligente(alvo: str) -> str:
-    """Executa varredura Nmap no alvo e correlaciona com processos locais."""
-    logger.info("Iniciando varredura em %s", alvo)
+def smart_audit(target: str) -> str:
+    """Run an Nmap scan on the target and correlate with local processes."""
+    logger.info("Starting scan on %s", target)
 
     try:
         nm = nmap.PortScanner(nmap_search_path=NMAP_PATH)
     except nmap.PortScannerError:
         nm = nmap.PortScanner()
 
-    nm.scan(alvo, arguments="-F")
+    nm.scan(target, arguments="-F")
 
-    resultados: list[str] = []
+    results: list[str] = []
 
     for host in nm.all_hosts():
-        logger.info("Host encontrado: %s", host)
+        logger.info("Host found: %s", host)
         for proto in nm[host].all_protocols():
             for port in sorted(nm[host][proto]):
-                estado = nm[host][proto][port]["state"]
-                nome_real = obter_processo_da_porta(port)
+                state = nm[host][proto][port]["state"]
+                process_name = get_process_by_port(port)
                 logger.info(
-                    "Porta %d/%s: %s | Processo: %s", port, proto, estado, nome_real
+                    "Port %d/%s: %s | Process: %s", port, proto, state, process_name
                 )
-                resultados.append(
-                    f"- Porta {port}/{proto} está {estado.upper()} "
-                    f"rodando: {nome_real}"
+                results.append(
+                    f"- Port {port}/{proto} is {state.upper()} "
+                    f"running: {process_name}"
                 )
 
-    return "\n".join(resultados) if resultados else "Nenhuma porta aberta detectada."
+    return "\n".join(results) if results else "No open ports detected."

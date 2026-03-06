@@ -3,25 +3,25 @@ FROM python:3.12-slim AS base
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Dependências do sistema
+# System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     nmap \
     && rm -rf /var/lib/apt/lists/*
 
-# Instala uv
+# Install uv
 RUN pip install --no-cache-dir uv
 
 WORKDIR /app
 
-# Cache de dependências
+# Cache dependencies
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
-# Código fonte
+# Source code
 COPY . .
 
-RUN chmod +x scripts/wait-for-ollama.sh
+RUN sed -i 's/\r$//' scripts/wait-for-ollama.sh && chmod +x scripts/wait-for-ollama.sh
 
 EXPOSE 3333
 

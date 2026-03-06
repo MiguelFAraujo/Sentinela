@@ -7,7 +7,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:11434/api/tags" ]
+      test: [ "CMD", "ollama", "list" ]
       interval: 15s
       timeout: 10s
       retries: 5
@@ -20,11 +20,12 @@ services:
       ollama:
         condition: service_healthy
     entrypoint: >
-      /bin/sh -c "sleep 3 && ollama pull llama3 && echo '✅ Modelo baixado!'"
+      /bin/sh -c "sleep 3 && ollama pull llama3 && echo '✅ Model downloaded!'"
     environment:
       - OLLAMA_HOST=http://ollama:11434
     volumes:
       - ollama_data:/root/.ollama
+    restart: "no"
 
   sentinela:
     build: .

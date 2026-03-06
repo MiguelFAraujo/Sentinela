@@ -1,5 +1,5 @@
 # ============================================================
-# 🛡️ Sentinela — Desinstalador (Windows/PowerShell)
+# 🛡️ Sentinela — Uninstaller (Windows/PowerShell)
 # ============================================================
 
 $ErrorActionPreference = "SilentlyContinue"
@@ -9,12 +9,12 @@ $BinDir = "$InstallDir\bin"
 $DataDir = "$env:USERPROFILE\.sentinela"
 
 Write-Host ""
-Write-Host "🛡️  Sentinela — Desinstalador" -ForegroundColor Cyan
+Write-Host "🛡️  Sentinela — Uninstaller" -ForegroundColor Cyan
 Write-Host ""
 
 # Stop containers
 if (Test-Path $DataDir) {
-    Write-Host "[INFO] Parando containers..." -ForegroundColor Cyan
+    Write-Host "[INFO] Stopping containers..." -ForegroundColor Cyan
     Push-Location $DataDir
     & docker compose down 2>$null
     Pop-Location
@@ -23,7 +23,7 @@ if (Test-Path $DataDir) {
 # Remove launcher
 if (Test-Path "$BinDir\sentinela.cmd") {
     Remove-Item "$BinDir\sentinela.cmd" -Force
-    Write-Host "[OK]   Comando 'sentinela' removido" -ForegroundColor Green
+    Write-Host "[OK]   Command 'sentinela' removed" -ForegroundColor Green
 }
 
 # Remove from PATH
@@ -31,13 +31,13 @@ $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if ($userPath -like "*$BinDir*") {
     $newPath = ($userPath -split ";" | Where-Object { $_ -ne $BinDir }) -join ";"
     [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
-    Write-Host "[OK]   PATH limpo" -ForegroundColor Green
+    Write-Host "[OK]   PATH cleaned" -ForegroundColor Green
 }
 
 # Remove data
 if (Test-Path $DataDir) {
     Remove-Item $DataDir -Recurse -Force
-    Write-Host "[OK]   Dados removidos" -ForegroundColor Green
+    Write-Host "[OK]   Data removed" -ForegroundColor Green
 }
 
 # Remove install dir
@@ -46,5 +46,5 @@ if (Test-Path $InstallDir) {
 }
 
 Write-Host ""
-Write-Host "✅ Sentinela desinstalado com sucesso!" -ForegroundColor Green
+Write-Host "✅ Sentinela uninstalled successfully!" -ForegroundColor Green
 Write-Host ""

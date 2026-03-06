@@ -1,18 +1,17 @@
-"""Sentinela — Agente principal (API + CLI)."""
+"""Sentinela — Main agent (API + CLI)."""
 
 from __future__ import annotations
 
 import argparse
 import logging
 import os
-import sys
 
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 from app.config import HOST, PORT, VERSION
-from app.llm import analisar_com_ia
-from app.scanner import auditoria_inteligente, pegar_ip_local
+from app.llm import analyze_with_ai
+from app.scanner import smart_audit, get_local_ip
 
 # ── Logging ───────────────────────────────────────────────────
 logging.basicConfig(
@@ -25,12 +24,12 @@ logger = logging.getLogger("sentinela")
 # ── FastAPI ───────────────────────────────────────────────────
 app = FastAPI(
     title="Sentinela EDR",
-    description="API de Monitoramento e Análise de Segurança com IA Local",
+    description="Security Monitoring and AI-Powered Analysis API",
     version=VERSION,
 )
 
 
-# ── Modelos ───────────────────────────────────────────────────
+# ── Models ────────────────────────────────────────────────────
 class ScanResponse(BaseModel):
     target: str
     status: str
@@ -40,36 +39,36 @@ class ScanResponse(BaseModel):
 
 
 # ── Core ──────────────────────────────────────────────────────
-def executar_varredura(host_alvo: str) -> dict:
-    """Executa varredura completa e chama o LLM para análise."""
+def run_scan(target_host: str) -> dict:
+    """Execute a full scan and call the LLM for analysis."""
     logger.info("━" * 50)
-    logger.info("🚀 PROTOCOLO SENTINELA (Target: %s)", host_alvo)
+    logger.info("🚀 SENTINELA PROTOCOL (Target: %s)", target_host)
     logger.info("━" * 50)
 
     try:
-        dados = auditoria_inteligente(host_alvo)
+        data = smart_audit(target_host)
 
-        analise = None
-        if dados != "Nenhuma porta aberta detectada.":
-            analise = analisar_com_ia(dados)
-            logger.info("🛡️  RELATÓRIO:\n%s", analise)
+        analysis = None
+        if data != "No open ports detected.":
+            analysis = analyze_with_ai(data)
+            logger.info("🛡️  REPORT:\n%s", analysis)
         else:
-            logger.info("✅ Sistema blindado — nenhuma porta exposta.")
+            logger.info("✅ System hardened — no exposed ports.")
 
         return {
-            "target": host_alvo,
+            "target": target_host,
             "status": "success",
-            "analysis": analise,
-            "raw_data": dados,
+            "analysis": analysis,
+            "raw_data": data,
         }
     except Exception as exc:
-        logger.exception("Erro durante varredura")
-        return {"target": host_alvo, "status": "error", "error": str(exc)}
+        logger.exception("Error during scan")
+        return {"target": target_host, "status": "error", "error": str(exc)}
 
 
-def _resolver_alvo(target: str | None = None) -> str:
-    """Resolve o IP alvo a partir do parâmetro, env ou detecção automática."""
-    return target or os.getenv("TARGET_IP") or pegar_ip_local()
+def _resolve_target(target: str | None = None) -> str:
+    """Resolve the target IP from parameter, env, or auto-detection."""
+    return target or os.getenv("TARGET_IP") or get_local_ip()
 
 
 # ── Endpoints ─────────────────────────────────────────────────
@@ -85,33 +84,33 @@ def health_check():
 
 @app.post("/scan", tags=["Operations"], response_model=ScanResponse)
 def trigger_scan(target: str | None = None):
-    resultado = executar_varredura(_resolver_alvo(target))
-    return ScanResponse(**resultado)
+    result = run_scan(_resolve_target(target))
+    return ScanResponse(**result)
 
 
 # ── CLI ───────────────────────────────────────────────────────
 def main():
-    """Entrypoint de linha de comando."""
+    """Command-line entrypoint."""
     parser = argparse.ArgumentParser(
-        description="🛡️ Sentinela — EDR com IA local",
+        description="🛡️ Sentinela — EDR with local AI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "comando",
+        "command",
         nargs="?",
         default="start_api",
         choices=["scan", "start_api"],
-        help="Comando a executar (padrão: start_api)",
+        help="Command to execute (default: start_api)",
     )
-    parser.add_argument("--target", help="IP alvo para varredura")
+    parser.add_argument("--target", help="Target IP for scanning")
     args = parser.parse_args()
 
-    if args.comando == "scan":
-        executar_varredura(_resolver_alvo(args.target))
+    if args.command == "scan":
+        run_scan(_resolve_target(args.target))
     else:
         import uvicorn
 
-        logger.info("🌐 Iniciando API em %s:%d", HOST, PORT)
+        logger.info("🌐 Starting API on %s:%d", HOST, PORT)
         uvicorn.run(app, host=HOST, port=PORT)
 
 

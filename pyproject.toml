@@ -1,7 +1,7 @@
 [project]
 name = "sentinela"
-version = "3.1.0"
-description = "EDR experimental open-source com análise via IA local (Ollama)"
+version = "3.1.1"
+description = "Experimental open-source EDR with local AI analysis (Ollama)"
 requires-python = ">=3.12"
 readme = "README.md"
 license = { text = "MIT" }

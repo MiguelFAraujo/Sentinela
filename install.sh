@@ -1,7 +1,7 @@
 #!/bin/sh
 # ============================================================
-# 🛡️ Sentinela — Instalador One-Command (Linux/macOS)
-# Uso: curl -fsSL install.cat/MiguelFAraujo/Sentinela | sh
+# 🛡️ Sentinela — One-Command Installer (Linux/macOS)
+# Usage: curl -fsSL install.cat/MiguelFAraujo/Sentinela | sh
 # ============================================================
 
 set -e
@@ -19,36 +19,36 @@ NC='\033[0m'
 
 header() {
     printf "\n${CYAN}══════════════════════════════════════════════════${NC}\n"
-    printf "${CYAN}  🛡️  Sentinela — Instalador Automático${NC}\n"
+    printf "${CYAN}  🛡️  Sentinela — Automatic Installer${NC}\n"
     printf "${CYAN}══════════════════════════════════════════════════${NC}\n\n"
 }
 
 info()    { printf "${CYAN}[INFO]${NC} %s\n" "$1"; }
 success() { printf "${GREEN}[OK]${NC}   %s\n" "$1"; }
 warn()    { printf "${YELLOW}[!]${NC}    %s\n" "$1"; }
-fail()    { printf "${RED}[ERRO]${NC} %s\n" "$1"; exit 1; }
+fail()    { printf "${RED}[ERR]${NC}  %s\n" "$1"; exit 1; }
 
 check_deps() {
     for cmd in docker git; do
         if ! command -v "$cmd" > /dev/null 2>&1; then
-            fail "$cmd não encontrado. Instale antes de continuar."
+            fail "$cmd not found. Please install it before continuing."
         fi
     done
-    success "Dependências verificadas (docker, git)"
+    success "Dependencies verified (docker, git)"
 }
 
 clone_or_update() {
     TARGET_DIR="${HOME}/.sentinela"
     if [ -d "$TARGET_DIR/.git" ]; then
-        info "Atualizando instalação existente..."
+        info "Updating existing installation..."
         cd "$TARGET_DIR"
         git pull --ff-only origin main 2>/dev/null || git pull origin main
-        success "Repositório atualizado"
+        success "Repository updated"
     else
-        info "Clonando repositório..."
+        info "Cloning repository..."
         rm -rf "$TARGET_DIR"
         git clone "https://github.com/${REPO}.git" "$TARGET_DIR"
-        success "Repositório clonado em $TARGET_DIR"
+        success "Repository cloned to $TARGET_DIR"
     fi
     cd "$TARGET_DIR"
 }
@@ -62,7 +62,7 @@ create_launcher() {
 SENTINELA_HOME="${HOME}/.sentinela"
 
 if [ ! -d "$SENTINELA_HOME" ]; then
-    echo "Sentinela não encontrado. Execute o instalador novamente."
+    echo "Sentinela not found. Please run the installer again."
     exit 1
 fi
 
@@ -70,18 +70,18 @@ cd "$SENTINELA_HOME"
 
 case "${1:-up}" in
     up|start)
-        echo "🛡️  Iniciando Sentinela..."
+        echo "🛡️  Starting Sentinela..."
         docker compose up -d --build
         echo ""
-        echo "✅ Sentinela rodando em http://localhost:3333"
-        echo "   Documentação: http://localhost:3333/docs"
+        echo "✅ Sentinela running at http://localhost:3333"
+        echo "   Documentation: http://localhost:3333/docs"
         ;;
     down|stop)
-        echo "⏹️  Parando Sentinela..."
+        echo "⏹️  Stopping Sentinela..."
         docker compose down
         ;;
     scan)
-        echo "🔍 Executando varredura..."
+        echo "🔍 Running scan..."
         docker compose exec sentinela uv run python -m app.agente scan ${2:+--target "$2"}
         ;;
     logs)
@@ -91,26 +91,26 @@ case "${1:-up}" in
         docker compose ps
         ;;
     update)
-        echo "🔄 Atualizando Sentinela..."
+        echo "🔄 Updating Sentinela..."
         git pull origin main
         docker compose up -d --build
-        echo "✅ Atualizado com sucesso!"
+        echo "✅ Updated successfully!"
         ;;
     *)
-        echo "Uso: sentinela {up|down|scan|logs|status|update}"
+        echo "Usage: sentinela {up|down|scan|logs|status|update}"
         echo ""
-        echo "  up      Inicia todos os serviços (padrão)"
-        echo "  down    Para todos os serviços"
-        echo "  scan    Executa uma varredura manual"
-        echo "  logs    Mostra logs em tempo real"
-        echo "  status  Mostra o status dos containers"
-        echo "  update  Atualiza para a versão mais recente"
+        echo "  up      Start all services (default)"
+        echo "  down    Stop all services"
+        echo "  scan    Run a manual scan"
+        echo "  logs    Follow logs in real-time"
+        echo "  status  Show container status"
+        echo "  update  Update to the latest version"
         ;;
 esac
 LAUNCHER
 
     chmod +x "${INSTALL_DIR}/${APP_NAME}"
-    success "Comando 'sentinela' instalado em ${INSTALL_DIR}"
+    success "Command 'sentinela' installed at ${INSTALL_DIR}"
 }
 
 add_to_path() {
@@ -137,28 +137,28 @@ add_to_path() {
         echo "export PATH=\"${INSTALL_DIR}:\$PATH\"" >> "$RC_FILE"
     fi
 
-    warn "PATH atualizado em $RC_FILE — rode 'source $RC_FILE' ou abra um novo terminal"
+    warn "PATH updated in $RC_FILE — run 'source $RC_FILE' or open a new terminal"
 }
 
 start_services() {
-    info "Iniciando serviços Docker..."
+    info "Starting Docker services..."
     docker compose up -d --build 2>&1 | tail -5
     echo ""
-    success "Sentinela instalado e rodando!"
+    success "Sentinela installed and running!"
 }
 
 print_summary() {
     printf "\n${GREEN}══════════════════════════════════════════════════${NC}\n"
-    printf "${GREEN}  ✅ Instalação Completa!${NC}\n"
+    printf "${GREEN}  ✅ Installation Complete!${NC}\n"
     printf "${GREEN}══════════════════════════════════════════════════${NC}\n\n"
     printf "  🌐 API:  ${CYAN}http://localhost:3333${NC}\n"
     printf "  📖 Docs: ${CYAN}http://localhost:3333/docs${NC}\n\n"
-    printf "  Comandos disponíveis:\n"
-    printf "    ${CYAN}sentinela${NC}          Inicia os serviços\n"
-    printf "    ${CYAN}sentinela scan${NC}     Executa uma varredura\n"
-    printf "    ${CYAN}sentinela logs${NC}     Acompanha os logs\n"
-    printf "    ${CYAN}sentinela down${NC}     Para os serviços\n"
-    printf "    ${CYAN}sentinela update${NC}   Atualiza para a versão mais recente\n\n"
+    printf "  Available commands:\n"
+    printf "    ${CYAN}sentinela${NC}          Start services\n"
+    printf "    ${CYAN}sentinela scan${NC}     Run a scan\n"
+    printf "    ${CYAN}sentinela logs${NC}     Follow logs\n"
+    printf "    ${CYAN}sentinela down${NC}     Stop services\n"
+    printf "    ${CYAN}sentinela update${NC}   Update to the latest version\n\n"
 }
 
 # --- Main ---
