@@ -4,16 +4,16 @@ services:
   sentinela:
     build: .
     container_name: sentinela_app
-    depends_on:
-      - ollama
     environment:
       - OLLAMA_HOST=http://ollama:11434
+    depends_on:
+      - ollama
     ports:
-      - "8000:8000"
+      - "3333:3333"
 
   ollama:
     image: ollama/ollama
-    container_name: sentinela_ollama
+    container_name: ollama_server
     ports:
       - "11434:11434"
     volumes:

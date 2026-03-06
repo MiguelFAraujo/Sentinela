@@ -1,13 +1,14 @@
 [project]
 name = "sentinela"
 version = "0.1.0"
-description = "Sentinela - Agente de Segurança Local com IA"
-readme = "README.md"
-requires-python = ">=3.12"
+description = "EDR com suporte a IA local (Ollama)"
+authors = [
+  { name="Miguel F Araujo", email="nigelkps1@gmail.com" }
+]
 dependencies = [
-    "requests",
-    "fastapi",
-    "uvicorn",
-    "psutil",
-    "python-nmap"
+  "fastapi",
+  "uvicorn",
+  "requests",
+  "psutil",
+  "python-nmap"
 ]

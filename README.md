@@ -1,33 +1,28 @@
 # Sentinela 🛡️
 
-Sentinela é um agente de segurança local inteligente que monitora portas abertas na sua máquina e utiliza IA local (Ollama) para analisar riscos em tempo real.
+# Sentinela com Docker
 
-## 🚀 Como Usar (Docker Compose - Recomendado)
+Requisitos:
+- Docker
+- Docker Compose
+- (Opcional) Ollama para uso local
 
-Este projeto utiliza **Docker Compose** para orquestrar o agente e o servidor Ollama, e **uv** para gerenciamento ultrarrápido de dependências Python.
+## Como rodar:
 
-### Pré-requisitos
-- Docker e Docker Compose instalados
+```bash
+git clone https://github.com/MiguelFAraujo/Sentinela
+cd Sentinela
+docker compose up
+```
 
-### Passo a Passo
+## Como atualizar dependências:
 
-1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/MiguelFAraujo/Sentinela
-   cd Sentinela
-   ```
-
-2. **Inicie a aplicação:**
-   ```bash
-   docker compose up --build
-   ```
-
-Isso irá:
-- Iniciar um container com o **Ollama** (API de IA local)
-- Construir e iniciar o container do **Sentinela**
-- O Sentinela aguardará o Ollama e iniciará a varredura automaticamente.
-
-> **Nota:** Na primeira vez, o Ollama pode precisar baixar o modelo `phi3`. Se o agente falhar ao conectar, aguarde alguns instantes e verifique os logs do Ollama.
+```bash
+uv add <lib>
+uv lock
+docker compose build
+docker compose up -d
+```
 
 ---
 
