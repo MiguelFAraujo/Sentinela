@@ -215,6 +215,16 @@ Contributions are welcome! Open an issue or pull request.
 
 Project created by **Miguel F. Araújo** during cybersecurity studies at **Hackers do Bem** (fundamental class).
 
+---
+
+## 🇧🇷 Nota para o Brasil / Note for Brazilians
+
+Este projeto foi idealizado e criado por **Miguel F. Araújo** durante seus estudos e formação em segurança cibernética pelo programa **Hackers do Bem**. O objetivo principal do Sentinela é disseminar conhecimento sobre segurança em endpoints e análise via IA (LLMs locais).
+
+**O Sentinela é um projeto de código aberto e será 100% gratuito para sempre.** Nenhuma funcionalidade core será bloqueada por "paywalls" — a segurança e a privacidade precisam ser acessíveis a todos.
+
+---
+
 ## License
 
 MIT License — see the [LICENSE](LICENSE) file for details.
