@@ -1,19 +1,27 @@
+"""Sentinela — Configurações centralizadas."""
+
 import os
+from pathlib import Path
 
-# Definições de Ambiente
-MODELO = os.getenv("MODELO", "llama3")
-OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+# ── Modelo de IA ──────────────────────────────────────────────
+MODELO: str = os.getenv("MODELO", "llama3")
+OLLAMA_HOST: str = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
-# Garante a URL da API
-if not OLLAMA_HOST.endswith("/api/generate"):
-    URL_OLLAMA_API = f"{OLLAMA_HOST}/api/generate"
-else:
-    URL_OLLAMA_API = OLLAMA_HOST
+# Garante URL completa da API
+URL_OLLAMA_API: str = (
+    OLLAMA_HOST
+    if OLLAMA_HOST.endswith("/api/generate")
+    else f"{OLLAMA_HOST}/api/generate"
+)
 
-# Configuração do Nmap
-if os.path.exists('/.dockerenv'):
-    # No Linux/Docker, o nmap geralmente está no PATH
-    NMAP_PATH = ["nmap"]
-else:
-    # Caminho Windows (Fallback seguro)
-    NMAP_PATH = [r"C:\Program Files (x86)\Nmap\nmap.exe"]
+# ── Scanner ───────────────────────────────────────────────────
+_IS_DOCKER = Path("/.dockerenv").exists()
+
+NMAP_PATH: list[str] = (
+    ["nmap"] if _IS_DOCKER else [r"C:\Program Files (x86)\Nmap\nmap.exe"]
+)
+
+# ── Servidor ──────────────────────────────────────────────────
+HOST: str = os.getenv("SENTINELA_HOST", "0.0.0.0")
+PORT: int = int(os.getenv("SENTINELA_PORT", "3333"))
+VERSION: str = "3.1.0"

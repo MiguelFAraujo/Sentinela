@@ -1,164 +1,223 @@
-# Sentinela 🛡️
-
 # 🛡️ Sentinela
 
-Sentinela é um EDR experimental open-source que integra monitoramento de sistema com análise via LLM local (Ollama), executando totalmente offline.
+**EDR experimental open-source com análise via IA local.**
+
+O Sentinela é um sistema de Endpoint Detection and Response que integra monitoramento de rede com análise inteligente via LLM local ([Ollama](https://ollama.ai)), executando **100% offline** — seus dados nunca saem da sua máquina.
 
 ![CI](https://github.com/MiguelFAraujo/Sentinela/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![Ollama](https://img.shields.io/badge/AI-Ollama-orange)
 
+---
+
+## Instale com Um Comando
+
+<details open>
+<summary><strong>🐧 Linux & macOS</strong></summary>
+
+```bash
+curl -fsSL install.cat/MiguelFAraujo/Sentinela | sh
+```
+</details>
+
+<details>
+<summary><strong>🪟 Windows (PowerShell)</strong></summary>
+
+```powershell
+irm install.cat/MiguelFAraujo/Sentinela | iex
+```
+</details>
+
+> Execute o mesmo comando novamente a qualquer momento para **atualizar** para a versão mais recente.
+
+---
+
+## Uso Rápido
+
+Após a instalação, o comando `sentinela` fica disponível no terminal:
+
+```bash
+sentinela              # Inicia todos os serviços
+sentinela scan         # Executa uma varredura manual
+sentinela logs         # Acompanha logs em tempo real
+sentinela status       # Mostra o status dos containers
+sentinela down         # Para todos os serviços
+sentinela update       # Atualiza para a última versão
+```
+
+**API disponível em:** `http://localhost:3333`
+**Documentação interativa:** `http://localhost:3333/docs`
+
+---
+
+## Desinstalar
+
+<details>
+<summary><strong>🐧 Linux & macOS</strong></summary>
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/MiguelFAraujo/Sentinela/main/uninstall.sh | sh
+```
+</details>
+
+<details>
+<summary><strong>🪟 Windows (PowerShell)</strong></summary>
+
+```powershell
+irm https://raw.githubusercontent.com/MiguelFAraujo/Sentinela/main/uninstall.ps1 | iex
+```
+</details>
+
+---
+
 ## Arquitetura
 
-O Sentinela roda em uma arquitetura moderna e containerizada, separando responsabilidades entre o agente de monitoramento e o motor de inferência IA.
+O Sentinela roda em uma arquitetura containerizada com Docker, separando responsabilidades entre o agente de monitoramento e o motor de inferência IA.
 
 ```mermaid
 graph TD
-    A[Sentinela App] -->|HTTP| B[Ollama LLM]
-    A -->|Netstat/Nmap| C[System Monitor]
-    B -->|Model Load| D[Volume Persistente]
+    A["🛡️ Sentinela App"] -->|HTTP API| B["🧠 Ollama LLM"]
+    A -->|"Nmap + psutil"| C["📡 Scanner de Rede"]
+    B -->|Modelo| D["💾 Volume Persistente"]
+    E["👤 Usuário"] -->|"CLI / REST API"| A
 ```
 
 ### Componentes
 
-- **Sentinela App (`app/`)**: Core em Python que orquestra varreduras e análise.
-- **Scanner**: Módulo que utiliza `nmap` e `psutil` para mapear a superfície de ataque local.
-- **LLM Client**: Interface de comunicação com a API do Ollama.
-- **Ollama**: Servidor de inferência executando o modelo `llama3` isolado.
+| Componente | Descrição |
+|---|---|
+| **Sentinela App** (`app/`) | Core em Python — orquestra varreduras e análise via FastAPI |
+| **Scanner** (`scanner.py`) | Nmap + psutil para mapear a superfície de ataque local |
+| **LLM Client** (`llm.py`) | Interface com a API do Ollama (sistema de prompts SOC) |
+| **Ollama** | Servidor de inferência executando `llama3` em container isolado |
 
 ---
 
-## 🚀 Como Rodar (Docker Compose)
+## Exemplo de Saída
 
-A forma recomendada de execução é via Docker Compose, que sobe todo o ambiente com uma única linha de comando.
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 PROTOCOLO SENTINELA (Target: 192.168.1.50)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Host encontrado: 192.168.1.50
+  Porta 135/tcp: OPEN rodando: svchost.exe (PID: 1104)
+  Porta 445/tcp: OPEN rodando: System (PID: 4)
+  Porta 5938/tcp: OPEN rodando: TeamViewer.exe (PID: 8832)
+
+🛡️ RELATÓRIO:
+1. TeamViewer em Wi-Fi público representa risco significativo...
+2. As portas 135/445 com processo System são normais no Windows...
+3. Recomendação: Desative o TeamViewer quando não estiver em uso.
+```
+
+---
+
+## Desenvolvimento
 
 ### Pré-requisitos
-- Docker e Docker Compose instalados
+- [Docker](https://docs.docker.com/get-docker/) e Docker Compose
+- [Python 3.12+](https://python.org) (para desenvolvimento local)
+- [uv](https://docs.astral.sh/uv/) (gerenciador de pacotes)
 
-### Execução
+### Setup Local (sem Docker)
 
 ```bash
 git clone https://github.com/MiguelFAraujo/Sentinela
 cd Sentinela
-docker compose up --build
+uv sync
+uv run sentinela scan --target 127.0.0.1
 ```
 
-O sistema irá automaticamente:
-1. Baixar as imagens necessárias.
-2. Iniciar o servidor Ollama.
-3. Baixar o modelo de IA (na primeira execução).
-4. Iniciar o agente Sentinela e realizar a primeira varredura.
+### Docker Compose (manual)
 
----
-
-## 📦 Desenvolvimento e Estrutura
-
-O projeto utiliza **uv** para gerenciamento de dependências e ambientes virtuais, garantindo builds reprodutíveis e rápidos.
+```bash
+docker compose up --build
+```
 
 ### Estrutura do Projeto
 
 ```
 Sentinela/
-├── app/                 # Código fonte da aplicação
-│   ├── agente.py        # Entrypoint
-│   ├── scanner.py       # Lógica de varredura
-│   ├── llm.py           # Integração com IA
-│   └── config.py        # Configurações
-├── scripts/             # Scripts utilitários (wait-for-ollama)
-├── tests/               # Testes automatizados
-├── .github/             # Workflows de CI/CD
-├── Dockerfile           # Definição da imagem Docker
-└── docker-compose.yml   # Orquestração dos serviços
+├── app/
+│   ├── agente.py        # Entrypoint (FastAPI + CLI)
+│   ├── scanner.py       # Varredura de rede (Nmap + psutil)
+│   ├── llm.py           # Integração IA (Ollama)
+│   └── config.py        # Configurações centralizadas
+├── scripts/
+│   └── wait-for-ollama.sh
+├── tests/               # Testes unitários
+├── install.sh           # Instalador Linux/macOS
+├── install.ps1          # Instalador Windows
+├── Dockerfile
+└── docker-compose.yml
 ```
 
-### Comandos Úteis
+### Comandos de Desenvolvimento
 
-Atualizar dependências:
 ```bash
-uv add <lib>
-uv lock
-```
-
-Rodar testes localmente:
-```bash
-uv run python -m unittest discover tests
+uv sync                                    # Instalar dependências
+uv run python -m pytest tests/ -v          # Rodar testes
+uv run sentinela start_api                 # Iniciar API local
+uv run sentinela scan --target 127.0.0.1   # Varredura local
 ```
 
 ---
 
-## 🤝 Contribuições
+## Variáveis de Ambiente
 
-Contribuições são bem-vindas! Por favor, abra uma issue ou pull request para melhorias e correções.
-
-## 📄 Licença
-
-Este projeto é distribuído sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
-Copyright (c) 2026 Miguel F Araujo
-
-
----
-
-## 💻 Instalação Manual (Windows/PowerShell)
-
-```
---------------------------------------------------
-INICIANDO PROTOCOLO SENTINELA V3.0
---------------------------------------------------
-Sentinela: Iniciando varredura PROFUNDA em 192.168.1.50...
-   > Host encontrado: 192.168.1.50
-     -> Porta 135: open | Software Real: svchost.exe (PID: 1104)
-     -> Porta 445: open | Software Real: System (PID: 4)
-     -> Porta 5938: open | Software Real: TeamViewer.exe (PID: 8832)
-
-Sentinela: Enviando verdade técnica para o llama3...
-
-RELATÓRIO DO ANALISTA:
-
-1. Sim, o TeamViewer em Wi-Fi público representa risco significativo...
-2. As portas 135 e 445 com o processo System são normais no Windows...
-3. Recomendação: Desative o TeamViewer quando não estiver em uso...
-```
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `OLLAMA_HOST` | `http://localhost:11434` | URL do servidor Ollama |
+| `MODELO` | `llama3` | Modelo de IA a utilizar |
+| `TARGET_IP` | Auto-detectado | IP alvo para varredura |
+| `SENTINELA_HOST` | `0.0.0.0` | Host do servidor API |
+| `SENTINELA_PORT` | `3333` | Porta do servidor API |
 
 ---
 
-## Avisos importantes
+## API Endpoints
 
-Este é um projeto educacional. Não substitui soluções profissionais de EDR. Use apenas em sua própria máquina e rede.
-
-**Privacidade**: Os dados nunca saem do seu computador. O llama3 roda 100% local.
-
-**Legalidade**: Não escaneie redes de terceiros sem autorização. É crime.
-
-**Propósito**: Ferramenta de aprendizado para quem estuda segurança e quer entender como sistemas de detecção funcionam na prática.
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/` | Status do serviço |
+| `GET` | `/health` | Health check |
+| `POST` | `/scan` | Executa varredura e análise |
+| `GET` | `/docs` | Documentação interativa (Swagger) |
 
 ---
 
-## Sobre
+## ⚠️ Avisos Importantes
 
-Meu nome é Miguel F. Araújo. Estou estudando segurança cibernética na **Hackers do Bem** (turma fundamental), uma iniciativa brasileira focada em ethical hacking e defesa de sistemas.
-
-Este projeto é parte do meu aprendizado. Se você também está começando na área de segurança, espero que o código seja útil para entender como integrar ferramentas básicas e criar algo funcional.
+> **Educacional**: Projeto de aprendizado. Não substitui soluções profissionais de EDR.
+>
+> **Privacidade**: Os dados nunca saem do seu computador. O llama3 roda 100% local.
+>
+> **Legalidade**: Não escaneie redes de terceiros sem autorização.
 
 ---
 
 ## Contribuições
 
-Se quiser melhorar o projeto, fique à vontade para abrir issues ou pull requests. Algumas ideias:
+Contribuições são bem-vindas! Abra uma issue ou pull request.
 
-- Suporte para Linux/macOS
-- Interface web para visualizar os relatórios
-- Exportar relatórios em JSON ou CSV
-- Integração com alertas (email, Telegram)
-- Melhorar os prompts da IA
+**Ideias:**
+- Suporte completo para Linux/macOS
+- Interface web para relatórios
+- Exportação em JSON/CSV
+- Alertas via email ou Telegram
+- Melhoria dos prompts de IA
 
 ---
+
+## Sobre
+
+Projeto criado por **Miguel F. Araújo** durante os estudos de segurança cibernética na **Hackers do Bem** (turma fundamental).
 
 ## Licença
 
-MIT License. Veja o arquivo `LICENSE` para detalhes.
+MIT License — veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**[GitHub](https://github.com/MiguelFAraujo) | Miguel F. Araújo | 2026**
+**[GitHub](https://github.com/MiguelFAraujo) · Miguel F. Araújo · 2026**

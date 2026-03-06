@@ -1,4 +1,11 @@
 __pycache__/
 .git
+.github
 .env
 *.log
+*.pyc
+.venv/
+venv/
+tests/
+.DS_Store
+Thumbs.db
