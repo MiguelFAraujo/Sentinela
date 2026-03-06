@@ -22,11 +22,20 @@ curl -fsSL install.cat/MiguelFAraujo/Sentinela | sh
 </details>
 
 <details>
-<summary><strong>🪟 Windows (PowerShell)</strong></summary>
+<summary><strong>🪟 Windows (PowerShell with Docker)</strong></summary>
 
 ```powershell
 irm install.cat/MiguelFAraujo/Sentinela | iex
 ```
+</details>
+
+<details>
+<summary><strong>🪟 Windows (Bare Metal / No Docker)</strong></summary>
+
+```powershell
+irm https://raw.githubusercontent.com/MiguelFAraujo/Sentinela/main/setup.ps1 | iex
+```
+*This Setup Wizard automatically installs Git, Nmap, Ollama, the AI model, and the Sentinela app directly to your machine.*
 </details>
 
 > Run the same command again at any time to **update** to the latest version.
