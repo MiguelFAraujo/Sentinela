@@ -8,6 +8,8 @@
 ![Nmap](https://img.shields.io/badge/Nmap-Network%20Scanner-4682B4?style=for-the-badge&logo=gnometerminal&logoColor=white)
 ![Ollama](https://img.shields.io/badge/Ollama-Phi--3-FF6F00?style=for-the-badge&logo=meta&logoColor=white)
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
+![Hackers do Bem](https://img.shields.io/badge/Hackers%20do%20Bem-Turma%20Fundamental-FF0000?style=for-the-badge&logo=security&logoColor=white)
 
 <br>
 
@@ -30,6 +32,8 @@
 - [Automação com Agendador de Tarefas](#-automação-com-agendador-de-tarefas)
 - [Exemplo de Saída](#-exemplo-de-saída)
 - [Segurança e Avisos](#-segurança-e-avisos)
+- [Sobre o Autor](#-sobre-o-autor)
+- [Como Contribuir](#-como-contribuir)
 - [Licença](#-licença)
 
 ---
@@ -88,8 +92,8 @@ O **Sentinela** é um EDR (Endpoint Detection & Response) caseiro que combina tr
 ### 1. Clonar ou baixar o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/sentinela.git
-cd sentinela
+git clone https://github.com/MiguelFAraujo/Sentinela.git
+cd Sentinela
 ```
 
 ### 2. Instalar dependências Python
@@ -235,6 +239,41 @@ Consulte o arquivo para mais detalhes.
 
 ---
 
+## 👨‍💻 Sobre o Autor
+
+<div align="center">
+
+### Miguel F. Araújo
+
+🎓 **Aluno da [Hackers do Bem](https://www.hackersdobem.org.br/) - Turma Fundamental**
+
+A **Hackers do Bem** é uma iniciativa brasileira que ensina segurança cibernética ética, 
+preparando profissionais para proteger sistemas e combater cibercrimes.
+
+</div>
+
+---
+
+## 🤝 Como Contribuir
+
+Contribuições são bem-vindas! Se você tem ideias para melhorar o Sentinela:
+
+1. Faça um **Fork** do projeto
+2. Crie uma **branch** para sua feature (`git checkout -b feature/MinhaFeature`)
+3. **Commit** suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
+4. Faça o **Push** (`git push origin feature/MinhaFeature`)
+5. Abra um **Pull Request**
+
+### 💡 Ideias para contribuir:
+
+- Adicionar suporte para Linux/macOS
+- Criar dashboard web para visualização dos relatórios
+- Adicionar alertas via email/Telegram
+- Melhorar prompts da IA para análises mais detalhadas
+- Adicionar testes automatizados
+
+---
+
 ## 📄 Licença
 
 Este projeto é distribuído sob a licença **MIT**. Veja o arquivo `LICENSE` para mais detalhes.
@@ -244,5 +283,7 @@ Este projeto é distribuído sob a licença **MIT**. Veja o arquivo `LICENSE` pa
 <div align="center">
 
 **Feito com 🧠 e ☕ para a comunidade de segurança brasileira.**
+
+[![GitHub](https://img.shields.io/badge/GitHub-MiguelFAraujo-black?style=social&logo=github)](https://github.com/MiguelFAraujo)
 
 </div>
