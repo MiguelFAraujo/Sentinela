@@ -1,17 +1,31 @@
 FROM python:3.12-slim
 
-# Instala manager uv
-RUN pip install uv && \
-    apt-get update && \
-    apt-get install -y nmap && \
-    rm -rf /var/lib/apt/lists/*
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Instala dependências do sistema
+RUN apt-get update && apt-get install -y \
+    curl \
+    bash \
+    nmap \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala uv
+RUN pip install uv
 
 WORKDIR /app
 
-# Copia e instala dependências
+# Copia arquivos de dependência primeiro (cache eficiente)
 COPY pyproject.toml uv.lock ./
+
 RUN uv sync --frozen
 
+# Copia resto do projeto
 COPY . .
 
-CMD ["uv", "run", "agente.py"]
+# Script de espera do Ollama
+RUN chmod +x scripts/wait-for-ollama.sh
+
+EXPOSE 3333
+
+CMD ["bash", "-c", "./scripts/wait-for-ollama.sh && uv run agente.py"]

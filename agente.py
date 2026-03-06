@@ -6,23 +6,22 @@ import socket
 import os
 
 # Configurações
-MODELO = "phi3"
+MODELO = "llama3" # Updated to match docker-compose model
 
 # Lê URL do Ollama da variável de ambiente, padrão para localhost se não definida
-# Isso funciona tanto no Docker Compose (http://ollama:11434) quanto localmente
-URL_OLLAMA = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
 if os.path.exists('/.dockerenv'):
-    URL_OLLAMA = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434/api/generate")
     # No Linux/Docker, o nmap geralmente está no PATH
     NMAP_PATH = ["nmap"]
 else:
     # Caminho Windows
     NMAP_PATH = [r"C:\Program Files (x86)\Nmap\nmap.exe"]
 
-# Garante que a URL termine com /api/generate se não tiver
-if not URL_OLLAMA.endswith("/api/generate"):
-    URL_OLLAMA = f"{URL_OLLAMA}/api/generate"
+# Garante que a URL termine com /api/generate
+# Ajuste conforme pedido: usar f"{OLLAMA_HOST}/api/generate"
+# Mas como já temos a base, vamos construir a URL completa aqui para usar nas chamadas
+URL_OLLAMA_API = f"{OLLAMA_HOST}/api/generate"
 
 def pegar_ip_local():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -100,7 +99,7 @@ def analisar_com_ia(dados_tecnicos):
     }
 
     try:
-        resposta = requests.post(URL_OLLAMA, json=payload)
+        resposta = requests.post(URL_OLLAMA_API, json=payload)
         return resposta.json()['response']
     except Exception as e:
         return f"Erro na IA: {e}"
