@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
-  { name = "Miguel F Araujo", email = "nigelkps1@gmail.com" },
+  { name = "Equipe Sentinela", email = "contato@sentinela.dev" },
 ]
 dependencies = [
     "fastapi",
